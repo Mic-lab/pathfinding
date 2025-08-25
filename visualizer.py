@@ -15,6 +15,7 @@ def update_path():
 pygame.init()
 screen = pygame.display.set_mode(SCREEN_SIZE)
 clock = pygame.time.Clock()
+font = pygame.font.SysFont('Courier New', 16)
 
 grid = [ [0] * GRID_SIZE[0] for i in range(GRID_SIZE[1]) ]
 
@@ -113,6 +114,7 @@ while running:
     #     for cell in grid:
     #         if 
 
+    screen.blit(font.render(f'{grid_pos}', False, (0, 255, 255)), (0, 0))
 
     pygame.display.update()
     clock.tick(60)

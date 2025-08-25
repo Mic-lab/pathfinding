@@ -35,7 +35,8 @@ class Tile:
 
     def calc_h(self, end):
         end_dist = (abs(self.x - end.x), abs(self.y - end.y))
-        if self.x > self.y:
+        # if self.x > self.y:
+        if end_dist[0] > end_dist[1]:
             big = end_dist[0]
             small = end_dist[1]
         else:
@@ -45,6 +46,10 @@ class Tile:
         horizontals = big - small
         # self.h = (diagonals * 14 + horizontals * 10) *1.000
         self.h = (diagonals * 14 + horizontals * 10)  
+
+
+        self.diagonals = diagonals
+        self.horizontals = horizontals
         # self.h = abs(self.x - end.x) * 10 + abs(self.y - end.y) * 10
         # self.h = (abs(self.x - end.x)**2 + abs(self.y - end.y)**2) ** 0.5
 
@@ -94,6 +99,13 @@ def calc_path(grid, start, end, grid_size):
     close_tiles = set()
 
     while True:
+        # print('\n\nStart of loop:')
+
+
+        debug_print = any((tile.x, tile.y) == (7, 7) for tile in open_tiles)
+        # debug_print = True
+        if debug_print: print('******'*30)
+
         # current = min(open_tiles, key=lambda e: e.f)
         current = next(iter(open_tiles))
         for tile in open_tiles:
@@ -106,8 +118,6 @@ def calc_path(grid, start, end, grid_size):
         
         open_tiles.remove(current) # can be optimized with pop
         close_tiles.add(current)
-
-        # print(f'{current=}')
 
         if current is end:
             t1 = perf_counter()
@@ -127,7 +137,7 @@ def calc_path(grid, start, end, grid_size):
             neighbor_tile.update(current, start, end)
             open_tiles.add(neighbor_tile)
 
-        print(f'{open_tiles=}')
+        # print(f'{open_tiles=}')
 
 def get_path(start, end):
     path = []
