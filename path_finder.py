@@ -14,10 +14,7 @@ class Tile:
         if self.h is None:
             self.calc_h(end)
 
-        # if self.x == potential_parent.x or self.y == potential_parent.y:
-        #     parent_dist = 10
-        # else:
-        #     parent_dist = 14
+        # NOTE: Could probably just create a distance function that can be used for this and also calc_h
         if abs(self.x - potential_parent.x) == 1 and abs(self.y - potential_parent.y) == 1:
             parent_dist = 14  # diagonal
         else:
@@ -35,7 +32,6 @@ class Tile:
 
     def calc_h(self, end):
         end_dist = (abs(self.x - end.x), abs(self.y - end.y))
-        # if self.x > self.y:
         if end_dist[0] > end_dist[1]:
             big = end_dist[0]
             small = end_dist[1]
@@ -43,38 +39,11 @@ class Tile:
             big = end_dist[1]
             small = end_dist[0]
         diagonals = small
-        horizontals = big - small
-        # self.h = (diagonals * 14 + horizontals * 10) *1.000
-        self.h = (diagonals * 14 + horizontals * 10)  
-
-
-        self.diagonals = diagonals
-        self.horizontals = horizontals
-        # self.h = abs(self.x - end.x) * 10 + abs(self.y - end.y) * 10
-        # self.h = (abs(self.x - end.x)**2 + abs(self.y - end.y)**2) ** 0.5
+        cardinals = big - small
+        self.h = (diagonals * 14 + cardinals * 10) * 1.001  # https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#breaking-ties
 
     def __repr__(self):
-        return f'({self.x}, {self.y})'
-
-def get_grid():
-    grid = []
-    for y, row in enumerate(STR_GRID.split()):
-        row = row.strip()
-        if not row:
-            continue
-
-        grid.append([])
-        for x, letter in enumerate(row):
-            if letter == 'x':
-                tile = False
-            else:
-                tile = Tile(x, y)
-                if letter == 's':
-                    start = tile
-                elif letter == 'e':
-                    end = tile
-            grid[y].append(tile)
-    return grid, start, end
+        return f'Tile({self.x}, {self.y})'
 
 def get_grid(grid_inp):
     grid = []
@@ -99,14 +68,6 @@ def calc_path(grid, start, end, grid_size):
     close_tiles = set()
 
     while True:
-        # print('\n\nStart of loop:')
-
-
-        debug_print = any((tile.x, tile.y) == (7, 7) for tile in open_tiles)
-        # debug_print = True
-        if debug_print: print('******'*30)
-
-        # current = min(open_tiles, key=lambda e: e.f)
         current = next(iter(open_tiles))
         for tile in open_tiles:
             if tile.f is None: continue
@@ -116,7 +77,7 @@ def calc_path(grid, start, end, grid_size):
             elif tile.f < current.f:
                 current = tile
         
-        open_tiles.remove(current) # can be optimized with pop
+        open_tiles.remove(current) # NOTE: Can be optimized with pop
         close_tiles.add(current)
 
         if current is end:
@@ -137,8 +98,6 @@ def calc_path(grid, start, end, grid_size):
             neighbor_tile.update(current, start, end)
             open_tiles.add(neighbor_tile)
 
-        # print(f'{open_tiles=}')
-
 def get_path(start, end):
     path = []
     current = end
@@ -147,7 +106,6 @@ def get_path(start, end):
         current = current.parent
         if current is start:
             return path
-
         
 neighbor_offset = set()
 for x in range(-1, 2):
@@ -156,18 +114,3 @@ for x in range(-1, 2):
         if coord == (0, 0):
             continue
         neighbor_offset.add(coord)
-#
-#
-# STR_GRID = '''
-# s.x..
-# .x...
-# ....e
-# '''
-#
-# grid, start, end = get_grid()
-#
-# grid_size = len(grid[0]), len(grid)
-# print(f'{grid_size=}')
-#
-# calc_path(grid, start, end)
-# path = get_path(start, end)
