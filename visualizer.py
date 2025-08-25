@@ -78,7 +78,7 @@ while running:
             update = True
             grid[grid_pos[1]][grid_pos[0]] = 0
 
-    grid[3][4] = 2
+    grid[6][12] = 2
     grid[end_pos[1]][end_pos[0]] = 3
 
     if update:

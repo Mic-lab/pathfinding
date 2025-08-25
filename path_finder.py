@@ -1,4 +1,5 @@
 # https://www.youtube.com/watch?v=-L-WgKMFuhE
+from time import perf_counter
 
 class Tile:
 
@@ -42,7 +43,8 @@ class Tile:
             small = end_dist[0]
         diagonals = small
         horizontals = big - small
-        self.h = (diagonals * 14 + horizontals * 10) *1.001
+        # self.h = (diagonals * 14 + horizontals * 10) *1.000
+        self.h = (diagonals * 14 + horizontals * 10)  
         # self.h = abs(self.x - end.x) * 10 + abs(self.y - end.y) * 10
         # self.h = (abs(self.x - end.x)**2 + abs(self.y - end.y)**2) ** 0.5
 
@@ -86,6 +88,8 @@ def get_grid(grid_inp):
     return grid, start, end
 
 def calc_path(grid, start, end, grid_size):
+    t0 = perf_counter()
+
     open_tiles = {start}
     close_tiles = set()
 
@@ -95,7 +99,7 @@ def calc_path(grid, start, end, grid_size):
         for tile in open_tiles:
             if tile.f is None: continue
             if tile.f == current.f:
-                if tile.g < current.f:
+                if tile.g < current.g:
                     current = tile
             elif tile.f < current.f:
                 current = tile
@@ -106,7 +110,9 @@ def calc_path(grid, start, end, grid_size):
         # print(f'{current=}')
 
         if current is end:
-            print(f'close_tiles explored {len(close_tiles)}')
+            t1 = perf_counter()
+            time_taken = round(t1 - t0, 4)
+            print(f'close_tiles explored {len(close_tiles)} ({time_taken} s)')
             return
 
         for offset in neighbor_offset:
@@ -120,6 +126,8 @@ def calc_path(grid, start, end, grid_size):
                 continue
             neighbor_tile.update(current, start, end)
             open_tiles.add(neighbor_tile)
+
+        print(f'{open_tiles=}')
 
 def get_path(start, end):
     path = []
